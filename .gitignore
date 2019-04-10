@@ -1,0 +1,10 @@
+#IAR specific
+Application/snake.dep
+Application/settings/
+
+#Build directory
+Application/_build/
+
+# Jlink log
+Application/JLinkLog.txt
+
