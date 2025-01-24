@@ -21,7 +21,7 @@ class Vertebra {
         std::cout << "Vertebra: x = " << x_ << ", y = " << y_ << std::endl;
     }
 
-    bool operator==(const Vertebra& other) {
+    bool operator==(const Vertebra& other) const {
         return x_ == other.x_ && y_ == other.y_;
     }
  private:

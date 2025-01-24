@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <list>
+#include <mutex>
 #include <unordered_map>
 
 #include "vertebra.hpp"
@@ -21,7 +22,8 @@ enum class Direction {
 
 class Snake {
  public:
-    explicit Snake(Direction direction, int x, int y) : direction_{direction} {
+    explicit Snake(Direction direction, int x, int y) : vertebrae_{}, direction_{direction},
+                    direction_mutex_{} {
         vertebrae_.emplace_back(Vertebra(x, y));
         auto [dx, dy] = direction_map_.at(direction_);
         vertebrae_.emplace_back(Vertebra(x + (-1 * dx), y + (-1 * dy)));
@@ -34,6 +36,7 @@ class Snake {
     }
 
     void Feed() {
+        std::unique_lock<std::mutex> lock{direction_mutex_};
         auto [dx, dy] = direction_map_.at(direction_);
         auto [x, y] = std::make_pair(vertebrae_.front().GetX() + dx, vertebrae_.front().GetY() + dy);
         vertebrae_.emplace_front(Vertebra(x, y));
@@ -50,6 +53,7 @@ class Snake {
     }
 
     void ChangeDirection(Direction direction) {
+        std::unique_lock<std::mutex> lock{direction_mutex_};
         direction_ = direction;
     }
 
@@ -59,9 +63,14 @@ class Snake {
         }
     }
 
+    Vertebra GetHead() {
+        return vertebrae_.front();
+    }
+
  private:
     std::list<Vertebra> vertebrae_;
     Direction direction_;
+    std::mutex direction_mutex_;
     const std::unordered_map<Direction, std::pair<int, int>> direction_map_ {{
         {Direction::UP, {0, 1}},
         {Direction::DOWN, {0, -1}},
